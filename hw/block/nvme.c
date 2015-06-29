@@ -154,6 +154,7 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
         qemu_sglist_destroy(&qsg);
         return NVME_INVALID_FIELD | NVME_DNR;
     }
+    qemu_sglist_destroy(&qsg);
     return NVME_SUCCESS;
 }
 
@@ -478,6 +479,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
     case NVME_NUMBER_OF_QUEUES:
         req->cqe.result =
             cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
+        break;
+    case NVME_VOLATILE_WRITE_CACHE:
+        req->cqe.result = cpu_to_le32(1);
         break;
     default:
         return NVME_INVALID_FIELD | NVME_DNR;
